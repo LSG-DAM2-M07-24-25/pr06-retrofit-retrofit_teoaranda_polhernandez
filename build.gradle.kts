@@ -11,13 +11,6 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.48")
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
+        classpath(libs.hilt.android.gradle.plugin)
     }
 }

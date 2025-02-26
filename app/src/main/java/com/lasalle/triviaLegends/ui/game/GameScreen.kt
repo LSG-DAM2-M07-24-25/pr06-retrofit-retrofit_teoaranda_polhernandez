@@ -48,6 +48,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.lasalle.triviaLegends.data.api.models.Question
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.shape.CircleShape
+import android.text.Html
+import android.os.Build
+
+fun String.decodeHtml(): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        Html.fromHtml(this, Html.FROM_HTML_MODE_LEGACY).toString()
+    } else {
+        @Suppress("DEPRECATION")
+        Html.fromHtml(this).toString()
+    }
+}
 
 /**
  * Pantalla principal del joc
@@ -256,7 +267,7 @@ fun QuestionScreen(
                     )
                 ) {
                     Text(
-                        text = question.question,
+                        text = question.question.decodeHtml(),
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center
@@ -358,7 +369,7 @@ fun AnswerCard(
         enabled = isEnabled
     ) {
         Text(
-            text = answer,
+            text = answer.decodeHtml(),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(16.dp)
         )

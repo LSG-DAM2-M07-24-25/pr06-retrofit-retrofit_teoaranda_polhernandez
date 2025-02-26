@@ -41,6 +41,7 @@ fun ScoresScreen(
 ) {
     val scores by viewModel.scores.collectAsState()
     val bestScore by viewModel.bestScore.collectAsState()
+    val worstScore by viewModel.worstScore.collectAsState()
     val averageScore by viewModel.averageScore.collectAsState()
     
     Column(
@@ -55,56 +56,70 @@ fun ScoresScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         )
         
-        // Millor puntuació
-        bestScore?.let { score ->
+        // Millor i pitjor puntuació
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Millor puntuació
             ElevatedCard(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.weight(1f)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Millor Puntuació",
+                        text = "Millor",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = "${score.score}",
-                        style = MaterialTheme.typography.displayMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    
-                    Text(
-                        text = "Dificultat: ${score.difficulty}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    
-                    Text(
-                        text = "Encert: ${score.successRate.toInt()}%",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    bestScore?.let { score ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Text(
+                            text = "${score.score}",
+                            style = MaterialTheme.typography.displaySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        
+                        Text(
+                            text = "Encert: ${score.successRate.toInt()}%",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
-        } ?: run {
-            // Si no hi ha millor puntuació
-            Card(
-                modifier = Modifier.fillMaxWidth()
+            
+            // Pitjor puntuació
+            ElevatedCard(
+                modifier = Modifier.weight(1f)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Encara no hi ha puntuacions",
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center
+                        text = "Pitjor",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
+                    
+                    worstScore?.let { score ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Text(
+                            text = "${score.score}",
+                            style = MaterialTheme.typography.displaySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        
+                        Text(
+                            text = "Encert: ${score.successRate.toInt()}%",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
         }

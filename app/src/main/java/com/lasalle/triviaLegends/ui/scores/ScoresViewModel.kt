@@ -5,10 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.lasalle.triviaLegends.data.database.entities.UserScore
 import com.lasalle.triviaLegends.data.repository.TriviaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -31,33 +34,39 @@ class ScoresViewModel @Inject constructor(
     // Format de data
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
     
-    // Totes les puntuacions
-    val scores: StateFlow<List<ScoreUiModel>> = repository.getAllScores()
-        .map { scores ->
-            scores.map { it.toUiModel() }
+    private val _scores = MutableStateFlow<List<ScoreUiModel>>(emptyList())
+    val scores: StateFlow<List<ScoreUiModel>> = _scores.asStateFlow()
+    
+    private val _bestScore = MutableStateFlow<ScoreUiModel?>(null)
+    val bestScore: StateFlow<ScoreUiModel?> = _bestScore.asStateFlow()
+    
+    private val _averageScore = MutableStateFlow(0f)
+    val averageScore: StateFlow<Float> = _averageScore.asStateFlow()
+    
+    private val _worstScore = MutableStateFlow<ScoreUiModel?>(null)
+    val worstScore: StateFlow<ScoreUiModel?> = _worstScore.asStateFlow()
+    
+    init {
+        viewModelScope.launch {
+            repository.getAllScores().collect { scores ->
+                val scoreModels = scores.map { it.toUiModel() }
+                _scores.value = scoreModels
+                
+                // Update best score
+                _bestScore.value = scoreModels.maxByOrNull { it.score }
+                
+                // Update worst score
+                _worstScore.value = scoreModels.minByOrNull { it.score }
+                
+                // Update average score
+                _averageScore.value = if (scoreModels.isNotEmpty()) {
+                    scoreModels.map { it.score }.average().toFloat()
+                } else {
+                    0f
+                }
+            }
         }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList()
-        )
-    
-    // Millor puntuació
-    val bestScore: StateFlow<ScoreUiModel?> = repository.getBestScore()
-        .map { score -> score?.toUiModel() }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null
-        )
-    
-    // Puntuació mitjana
-    val averageScore: StateFlow<Float> = repository.getAverageScore()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            0f
-        )
+    }
     
     /**
      * Converteix un UserScore a un model per la UI

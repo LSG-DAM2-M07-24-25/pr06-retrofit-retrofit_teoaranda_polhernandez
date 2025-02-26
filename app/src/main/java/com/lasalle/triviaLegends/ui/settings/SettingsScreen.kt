@@ -1,5 +1,6 @@
 package com.lasalle.triviaLegends.ui.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,9 +15,12 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,15 +82,27 @@ fun SettingsScreen(
                                 onClick = { viewModel.setDefaultDifficulty(value) },
                                 role = Role.RadioButton
                             )
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
                             selected = defaultDifficulty == value,
-                            onClick = null
+                            onClick = null,
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                                unselectedColor = MaterialTheme.colorScheme.outline
+                            )
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = label)
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (defaultDifficulty == value) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            }
+                        )
                     }
                 }
             }
@@ -178,8 +194,9 @@ fun SettingsSection(
     title: String,
     content: @Composable () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -187,11 +204,14 @@ fun SettingsSection(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
             )
             
             Divider(
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             )
             
             content()

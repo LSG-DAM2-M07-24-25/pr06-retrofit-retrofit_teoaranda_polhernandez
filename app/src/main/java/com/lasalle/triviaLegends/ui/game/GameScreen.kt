@@ -21,11 +21,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -40,16 +42,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.lasalle.triviaLegends.R
 import com.lasalle.triviaLegends.data.api.models.Question
 import kotlinx.coroutines.delay
-import androidx.compose.foundation.shape.CircleShape
 import android.text.Html
 import android.os.Build
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.ui.graphics.Color
 
 fun String.decodeHtml(): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -198,6 +209,20 @@ fun QuestionScreen(
     }
     
     Box(modifier = Modifier.fillMaxSize()) {
+        // Fondo con gradiente
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.surface,
+                            MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    )
+                )
+        )
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -205,79 +230,111 @@ fun QuestionScreen(
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             item {
-                // Capçalera amb progrés i puntuació
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                // Barra superior mejorada
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)
+                    )
                 ) {
-                    Text(
-                        text = "Pregunta ${questionIndex + 1}/$totalQuestions",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = "Puntuació: $score",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Pregunta ${questionIndex + 1}/$totalQuestions",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = "Puntuació: $score",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        LinearProgressIndicator(
+                            progress = (questionIndex.toFloat() + 1) / totalQuestions,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    }
                 }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Barra de progrés
-                LinearProgressIndicator(
-                    progress = (questionIndex.toFloat() + 1) / totalQuestions,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Categoria i dificultat
+
+                // Categoría y dificultad mejoradas
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = question.category,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = when(question.difficulty) {
-                            "easy" -> "Fàcil"
-                            "medium" -> "Mitjana"
-                            "hard" -> "Difícil"
-                            else -> question.difficulty
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = when(question.difficulty) {
-                            "easy" -> Color.Green
-                            "medium" -> Color.Blue
-                            "hard" -> Color.Red
-                            else -> MaterialTheme.colorScheme.onSurface
-                        }
-                    )
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        )
+                    ) {
+                        Text(
+                            text = question.category,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        )
+                    }
+                    
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = when(question.difficulty) {
+                                "easy" -> Color.Green.copy(alpha = 0.2f)
+                                "medium" -> Color.Blue.copy(alpha = 0.2f)
+                                "hard" -> Color.Red.copy(alpha = 0.2f)
+                                else -> MaterialTheme.colorScheme.surfaceVariant
+                            }
+                        )
+                    ) {
+                        Text(
+                            text = when(question.difficulty) {
+                                "easy" -> "Fàcil"
+                                "medium" -> "Mitjana"
+                                "hard" -> "Difícil"
+                                else -> question.difficulty
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            color = when(question.difficulty) {
+                                "easy" -> Color.Green
+                                "medium" -> Color.Blue
+                                "hard" -> Color.Red
+                                else -> MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
                 }
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Pregunta
-                Card(
+
+                // Pregunta mejorada
+                ElevatedCard(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
                 ) {
                     Text(
                         text = question.question.decodeHtml(),
                         style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(24.dp),
                         textAlign = TextAlign.Center
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(24.dp))
             }
             
-            // Respostes
+            item { Spacer(modifier = Modifier.height(24.dp)) }
+            
+            // Respuestas mejoradas
             items(question.getAllAnswers()) { answer ->
                 AnswerCard(
                     answer = answer,
@@ -291,7 +348,7 @@ fun QuestionScreen(
                         }
                     }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
         
@@ -354,19 +411,35 @@ fun AnswerCard(
     onClick: () -> Unit
 ) {
     val backgroundColor = when {
-        isCorrect == true -> Color.Green.copy(alpha = 0.2f)
-        isCorrect == false && isSelected -> Color.Red.copy(alpha = 0.2f)
+        isCorrect == true -> Color.Green.copy(alpha = 0.15f)
+        isCorrect == false && isSelected -> Color.Red.copy(alpha = 0.15f)
         isSelected -> MaterialTheme.colorScheme.primaryContainer
         else -> MaterialTheme.colorScheme.surface
     }
     
+    val borderColor = when {
+        isCorrect == true -> Color.Green
+        isCorrect == false && isSelected -> Color.Red
+        isSelected -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.outline
+    }
+    
     ElevatedCard(
         onClick = { if (isEnabled) onClick() },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = if (isSelected) borderColor else Color.Transparent,
+                shape = MaterialTheme.shapes.medium
+            ),
         colors = CardDefaults.elevatedCardColors(
             containerColor = backgroundColor
         ),
-        enabled = isEnabled
+        enabled = isEnabled,
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = if (isSelected) 8.dp else 4.dp
+        )
     ) {
         Text(
             text = answer.decodeHtml(),
@@ -392,65 +465,104 @@ fun GameFinishedScreen(
         visible = true
     }
     
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(animationSpec = tween(1000)),
-        exit = fadeOut()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.surfaceVariant
+                    )
+                )
+            ),
+        contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(animationSpec = tween(1000)) + scaleIn(
+                initialScale = 0.8f,
+                animationSpec = tween(500)
+            ),
+            exit = fadeOut()
         ) {
-            Text(
-                text = "Joc Finalitzat!",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
-            )
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            ElevatedCard(
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .padding(32.dp)
+                    .fillMaxWidth(0.9f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Text(
+                    text = "Joc Finalitzat!",
+                    style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
                 ) {
-                    Text(
-                        text = "Puntuació Final",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    
-                    Text(
-                        text = "$score",
-                        style = MaterialTheme.typography.displayLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Text(
-                        text = "Respostes correctes: $correctAnswers/$totalQuestions",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    
-                    Text(
-                        text = "Percentatge d'encert: ${(correctAnswers.toFloat() / totalQuestions * 100).toInt()}%",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Puntuació Final",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Text(
+                            text = "$score",
+                            style = MaterialTheme.typography.displayMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "$correctAnswers de $totalQuestions correctes",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        Button(
+                            onClick = onPlayAgain,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text(
+                                text = "Tornar a Jugar",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+                    }
                 }
-            }
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            Button(
-                onClick = onPlayAgain,
-                modifier = Modifier.fillMaxWidth(0.7f)
-            ) {
-                Text(text = "Tornar a jugar")
             }
         }
     }

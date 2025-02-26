@@ -1,5 +1,6 @@
 package com.lasalle.triviaLegends.ui.scores
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,9 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
@@ -22,6 +27,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -209,40 +216,84 @@ fun ScoresScreen(
  */
 @Composable
 fun ScoreItem(score: ScoreUiModel) {
-    Row(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp, horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = score.formattedDate,
-                style = MaterialTheme.typography.bodySmall
-            )
+            // Puntuación destacada
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "${score.score}",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             
-            Text(
-                text = "Dificultat: ${score.difficulty}",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-        
-        Column(
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = "${score.score} punts",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
+            Spacer(modifier = Modifier.width(16.dp))
             
-            Text(
-                text = "${score.correctAnswers}/${score.totalQuestions} correctes",
-                style = MaterialTheme.typography.bodySmall
-            )
+            // Detalles
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = score.formattedDate,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Dificultad
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = when(score.difficulty) {
+                                "Fàcil" -> Color.Green.copy(alpha = 0.2f)
+                                "Mitjana" -> Color.Blue.copy(alpha = 0.2f)
+                                "Difícil" -> Color.Red.copy(alpha = 0.2f)
+                                else -> MaterialTheme.colorScheme.surfaceVariant
+                            }
+                        ),
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = score.difficulty,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            color = when(score.difficulty) {
+                                "Fàcil" -> Color.Green
+                                "Mitjana" -> Color.Blue
+                                "Difícil" -> Color.Red
+                                else -> MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
+                    
+                    // Aciertos
+                    Text(
+                        text = "${score.correctAnswers}/${score.totalQuestions}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
         }
     }
 } 

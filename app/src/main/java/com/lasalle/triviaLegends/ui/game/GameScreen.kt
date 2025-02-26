@@ -166,110 +166,132 @@ fun QuestionScreen(
 ) {
     var selectedAnswer by remember { mutableStateOf<String?>(null) }
     var isAnswered by remember { mutableStateOf(false) }
+    var showFeedback by remember { mutableStateOf(false) }
     
     LaunchedEffect(isAnswered) {
         if (isAnswered) {
-            delay(1000) // Show the result for 1 second
+            showFeedback = true
+            delay(800) // Reducimos un poco el tiempo para el feedback
+            showFeedback = false
+            delay(200) // Esperamos a que se complete la animación de fade out
             onAnswerSelected(selectedAnswer ?: return@LaunchedEffect)
             selectedAnswer = null
             isAnswered = false
         }
     }
     
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentPadding = PaddingValues(bottom = 16.dp)
-    ) {
-        item {
-            // Capçalera amb progrés i puntuació
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Pregunta ${questionIndex + 1}/$totalQuestions",
-                    style = MaterialTheme.typography.titleMedium
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
+            item {
+                // Capçalera amb progrés i puntuació
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Pregunta ${questionIndex + 1}/$totalQuestions",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = "Puntuació: $score",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Barra de progrés
+                LinearProgressIndicator(
+                    progress = (questionIndex.toFloat() + 1) / totalQuestions,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Text(
-                    text = "Puntuació: $score",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                // Categoria i dificultat
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = question.category,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = when(question.difficulty) {
+                            "easy" -> "Fàcil"
+                            "medium" -> "Mitjana"
+                            "hard" -> "Difícil"
+                            else -> question.difficulty
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = when(question.difficulty) {
+                            "easy" -> Color.Green
+                            "medium" -> Color.Blue
+                            "hard" -> Color.Red
+                            else -> MaterialTheme.colorScheme.onSurface
+                        }
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Pregunta
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Text(
+                        text = question.question,
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(24.dp))
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // Barra de progrés
-            LinearProgressIndicator(
-                progress = (questionIndex.toFloat() + 1) / totalQuestions,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // Categoria i dificultat
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = question.category,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = when(question.difficulty) {
-                        "easy" -> "Fàcil"
-                        "medium" -> "Mitjana"
-                        "hard" -> "Difícil"
-                        else -> question.difficulty
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = when(question.difficulty) {
-                        "easy" -> Color.Green
-                        "medium" -> Color.Blue
-                        "hard" -> Color.Red
-                        else -> MaterialTheme.colorScheme.onSurface
+            // Respostes
+            items(question.getAllAnswers()) { answer ->
+                AnswerCard(
+                    answer = answer,
+                    isSelected = selectedAnswer == answer,
+                    isCorrect = if (isAnswered) answer == question.correctAnswer else null,
+                    isEnabled = !isAnswered,
+                    onClick = {
+                        if (!isAnswered) {
+                            selectedAnswer = answer
+                            isAnswered = true
+                        }
                     }
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Pregunta
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            ) {
-                Text(
-                    text = question.question,
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(16.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
         }
         
-        // Respostes
-        items(question.getAllAnswers()) { answer ->
-            AnswerCard(
-                answer = answer,
-                isSelected = selectedAnswer == answer,
-                isCorrect = if (isAnswered) answer == question.correctAnswer else null,
-                isEnabled = !isAnswered,
-                onClick = {
-                    if (!isAnswered) {
-                        selectedAnswer = answer
-                        isAnswered = true
-                    }
-                }
+        // Feedback overlay
+        AnimatedVisibility(
+            visible = showFeedback,
+            enter = fadeIn(animationSpec = tween(200)),
+            exit = fadeOut(animationSpec = tween(200)),
+            modifier = Modifier.align(Alignment.Center)
+        ) {
+            val isCorrect = selectedAnswer == question.correctAnswer
+            Text(
+                text = if (isCorrect) "Correcte!" else "Incorrecte!",
+                style = MaterialTheme.typography.displayMedium,
+                color = if (isCorrect) Color.Green else Color.Red,
+                fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

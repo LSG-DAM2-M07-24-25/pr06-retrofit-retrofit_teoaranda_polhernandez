@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
@@ -76,7 +77,7 @@ fun TriviaApp() {
             composable(Screen.Scores.route) {
                 ScoresScreen()
             }
-            composable(Screen.Settings.route) {
+            composable(Screen.Info.route) {
                 SettingsScreen()
             }
         }
@@ -128,13 +129,13 @@ sealed class Screen(
         Icons.Default.List
     )
     
-    object Settings : Screen(
-        "settings",
-        "Configuració",
-        Icons.Default.Settings
+    object Info : Screen(
+        "info",
+        "Info",
+        Icons.Default.Info
     )
     
     companion object {
-        val items = listOf(Game, Scores, Settings)
+        val items = listOf(Game, Scores, Info)
     }
 } 

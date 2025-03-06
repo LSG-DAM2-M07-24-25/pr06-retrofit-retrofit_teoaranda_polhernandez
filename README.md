@@ -1,5 +1,7 @@
 # Trivia Legends 🎮
 
+<img width="1512" alt="Screenshot 2025-03-06 at 11 00 21" src="https://github.com/user-attachments/assets/e8822894-6477-4c21-9dd8-da4e42fc3f31" />
+
 ## Descripció del Projecte
 
 Trivia Legends és una aplicació de preguntes i respostes desenvolupada amb les últimes tecnologies d'Android. El joc desafia als usuaris amb preguntes de diferents categories idifficulties, permetent competir per les millors puntuacions.

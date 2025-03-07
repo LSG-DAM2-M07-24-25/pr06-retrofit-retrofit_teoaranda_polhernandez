@@ -61,6 +61,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
+import com.lasalle.triviaLegends.ui.game.medium.GameScreenMedium
+import com.lasalle.triviaLegends.ui.game.small.GameScreenSmall
+import com.lasalle.triviaLegends.ui.game.large.GameScreenLarge
 
 fun String.decodeHtml(): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -79,51 +84,26 @@ fun String.decodeHtml(): String {
  * NOTA POL: He afegit animacions per fer l'experiència més fluida
  */
 @Composable
-fun GameScreen(
-    viewModel: GameViewModel = hiltViewModel()
-) {
-    val gameState by viewModel.gameState.collectAsState()
-    val currentQuestionIndex by viewModel.currentQuestionIndex.collectAsState()
-    val score by viewModel.score.collectAsState()
-    val correctAnswers by viewModel.correctAnswers.collectAsState()
+fun GameScreen() {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
     
-    // Iniciar el joc si encara no s'ha iniciat
-    LaunchedEffect(key1 = Unit) {
-        if (gameState == GameState.Loading) {
-            viewModel.startGame()
+    when {
+        screenWidth < 600.dp -> {
+            GameScreenSmall()
+        }
+        screenWidth < 840.dp -> {
+            GameScreenMedium()
+        }
+        else -> {
+            GameScreenLarge()
         }
     }
-    
-    Box(modifier = Modifier.fillMaxSize()) {
-        when (gameState) {
-            GameState.Loading -> LoadingScreen()
-            GameState.Playing -> {
-                val currentQuestion = viewModel.getCurrentQuestion()
-                if (currentQuestion != null) {
-                    QuestionScreen(
-                        question = currentQuestion,
-                        questionIndex = currentQuestionIndex,
-                        totalQuestions = 10, // Hauria de venir del ViewModel
-                        score = score,
-                        onAnswerSelected = { answer ->
-                            val isCorrect = viewModel.checkAnswer(answer)
-                            viewModel.nextQuestion()
-                        }
-                    )
-                }
-            }
-            GameState.Finished -> GameFinishedScreen(
-                score = score,
-                correctAnswers = correctAnswers,
-                totalQuestions = 10, // Hauria de venir del ViewModel
-                onPlayAgain = { viewModel.restartGame() }
-            )
-            is GameState.Error -> ErrorScreen(
-                message = (gameState as GameState.Error).message,
-                onRetry = { viewModel.startGame() }
-            )
-        }
-    }
+}
+
+@Composable
+fun GameScreenLarge() {
+    TODO("Not yet implemented")
 }
 
 /**

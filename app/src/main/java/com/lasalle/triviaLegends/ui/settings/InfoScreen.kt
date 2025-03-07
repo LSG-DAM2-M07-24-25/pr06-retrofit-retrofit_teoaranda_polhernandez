@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.platform.LocalConfiguration
 
 /**
  * Pantalla de configuració
@@ -32,9 +33,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
  * només mostrem la dificultat predeterminada i el temps per pregunta.
  */
 @Composable
-fun SettingsScreen(
-    viewModel: InfoViewModel = hiltViewModel()
-) {
+fun InfoScreen() {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    
+    when {
+        screenWidth < 600.dp -> {
+            InfoScreenSmall()
+        }
+        screenWidth < 840.dp -> {
+            InfoScreenMedium()
+        }
+        else -> {
+            InfoScreenLarge()
+        }
+    }
+}
+
+@Composable
+fun InfoScreenSmall() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -164,6 +181,16 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+@Composable
+fun InfoScreenMedium() {
+    // Implementa la lógica per a la pantalla mitjana
+}
+
+@Composable
+fun InfoScreenLarge() {
+    // Implementa la lógica per a la pantalla gran
 }
 
 /**

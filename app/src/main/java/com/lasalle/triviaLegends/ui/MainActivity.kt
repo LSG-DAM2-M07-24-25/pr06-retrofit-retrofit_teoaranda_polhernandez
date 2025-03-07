@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lasalle.triviaLegends.ui.game.GameScreen
 import com.lasalle.triviaLegends.ui.scores.ScoresScreen
-import com.lasalle.triviaLegends.ui.settings.SettingsScreen
+import com.lasalle.triviaLegends.ui.settings.InfoScreen
 import com.lasalle.triviaLegends.ui.theme.TriviaLegendsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -78,7 +77,7 @@ fun TriviaApp() {
                 ScoresScreen()
             }
             composable(Screen.Info.route) {
-                SettingsScreen()
+                InfoScreen()
             }
         }
     }

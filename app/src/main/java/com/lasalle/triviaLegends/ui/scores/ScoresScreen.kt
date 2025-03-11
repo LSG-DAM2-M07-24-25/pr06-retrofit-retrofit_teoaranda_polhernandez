@@ -15,20 +15,33 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,6 +64,22 @@ fun ScoresScreen(
     val worstScore by viewModel.worstScore.collectAsState()
     val averageScore by viewModel.averageScore.collectAsState()
     
+    // Estado para la búsqueda
+    var searchQuery by remember { mutableStateOf("") }
+    
+    // Filtrar las puntuaciones según la búsqueda
+    val filteredScores = remember(scores, searchQuery) {
+        if (searchQuery.isEmpty()) {
+            scores
+        } else {
+            scores.filter { score ->
+                score.difficulty.contains(searchQuery, ignoreCase = true) ||
+                score.formattedDate.contains(searchQuery, ignoreCase = true) ||
+                score.score.toString().contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,6 +90,43 @@ fun ScoresScreen(
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        // Barra de búsqueda
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            placeholder = { Text("Cerca per data, dificultat o puntuació") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Cerca",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery = "" }) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Netejar",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
         
         // Millor i pitjor puntuació
@@ -185,7 +251,7 @@ fun ScoresScreen(
             modifier = Modifier.padding(vertical = 8.dp)
         )
         
-        if (scores.isEmpty()) {
+        if (filteredScores.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -193,7 +259,10 @@ fun ScoresScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Juga una partida per veure l'historial",
+                    text = if (searchQuery.isEmpty()) 
+                        "Juga una partida per veure l'historial" 
+                    else 
+                        "No s'han trobat resultats per '$searchQuery'",
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
@@ -202,7 +271,7 @@ fun ScoresScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(scores) { score ->
+                items(filteredScores) { score ->
                     ScoreItem(score = score)
                     Divider()
                 }

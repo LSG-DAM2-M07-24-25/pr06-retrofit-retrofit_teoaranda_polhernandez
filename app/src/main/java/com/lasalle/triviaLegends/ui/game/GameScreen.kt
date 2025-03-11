@@ -63,9 +63,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import android.content.res.Configuration
-import com.lasalle.triviaLegends.ui.game.medium.GameScreenMedium
-import com.lasalle.triviaLegends.ui.game.small.GameScreenSmall
-import com.lasalle.triviaLegends.ui.game.large.GameScreenLarge
+
 
 fun String.decodeHtml(): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -84,26 +82,52 @@ fun String.decodeHtml(): String {
  * NOTA POL: He afegit animacions per fer l'experiència més fluida
  */
 @Composable
-fun GameScreen() {
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
+fun GameScreen(
+    viewModel: GameViewModel = hiltViewModel()
+) {
+    val gameState by viewModel.gameState.collectAsState()
+    val score by viewModel.score.collectAsState()
+    val correctAnswers by viewModel.correctAnswers.collectAsState()
+    val currentQuestionIndex by viewModel.currentQuestionIndex.collectAsState()
     
-    when {
-        screenWidth < 600.dp -> {
-            GameScreenSmall()
+    when (gameState) {
+        is GameState.Loading -> {
+            LoadingScreen()
         }
-        screenWidth < 840.dp -> {
-            GameScreenMedium()
+        is GameState.Playing -> {
+            val currentQuestion = viewModel.getCurrentQuestion()
+            if (currentQuestion != null) {
+                QuestionScreen(
+                    question = currentQuestion,
+                    questionIndex = currentQuestionIndex,
+                    totalQuestions = 10, // O usar viewModel.getTotalQuestions() si existe
+                    score = score,
+                    onAnswerSelected = { answer ->
+                        val isCorrect = viewModel.checkAnswer(answer)
+                        viewModel.nextQuestion()
+                    }
+                )
+            }
         }
-        else -> {
-            GameScreenLarge()
+        is GameState.Finished -> {
+            GameFinishedScreen(
+                score = score,
+                correctAnswers = correctAnswers,
+                totalQuestions = 10, // O usar viewModel.getTotalQuestions() si existe
+                onPlayAgain = {
+                    viewModel.restartGame()
+                }
+            )
+        }
+        is GameState.Error -> {
+            ErrorScreen(
+                message = (gameState as GameState.Error).message,
+                onRetry = {
+                    viewModel.startGame()
+                }
+            )
         }
     }
-}
-
-@Composable
-fun GameScreenLarge() {
-    TODO("Not yet implemented")
 }
 
 /**

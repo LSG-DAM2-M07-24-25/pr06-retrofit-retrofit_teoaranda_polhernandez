@@ -8,7 +8,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lasalle.triviaLegends.ui.settings.InfoViewModel
+import com.lasalle.triviaLegends.ui.settings.ApiInfoSection
+import com.lasalle.triviaLegends.ui.settings.ScoringSystemSection
+import com.lasalle.triviaLegends.ui.settings.CreditsSection
+import com.lasalle.triviaLegends.ui.settings.DeveloperCard
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.font.FontWeight
 
+/**
+ * Pantalla d'informació per a dispositius mitjans (tablets petites, mòbils en horitzontal)
+ * Mostra un disseny amb un panell lateral esquerre i el contingut principal a la dreta
+ * 
+ * @author Pol & Teo
+ */
 @Composable
 fun InfoScreenMedium(
     viewModel: InfoViewModel = hiltViewModel()
@@ -18,7 +31,7 @@ fun InfoScreenMedium(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        // Panel lateral (30%)
+        // Panell lateral (30%)
         Card(
             modifier = Modifier
                 .weight(0.3f)
@@ -37,89 +50,51 @@ fun InfoScreenMedium(
                 Text(
                     text = "Trivia Legends",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    fontWeight = FontWeight.Bold
                 )
+                
                 Text(
-                    text = "Versió 1.0.0",
+                    text = "Versió 1.0",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                Text(
+                    text = "Desenvolupadors",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                DeveloperCard("Pol Hernández")
+                DeveloperCard("Teo Aranda")
             }
         }
         
-        // Contenido principal (70%)
+        // Contingut principal (70%)
         Column(
             modifier = Modifier
                 .weight(0.7f)
                 .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
         ) {
             Text(
                 text = "Informació",
                 style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
             
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp)
-                ) {
-                    Text(
-                        text = "Sobre l'aplicació",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = "Trivia Legends és un joc de preguntes i respostes desenvolupat per estudiants de La Salle. Aquest projecte forma part de l'assignatura de Desenvolupament d'Aplicacions Mòbils.",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
+            // Secció sobre l'API
+            ApiInfoSection()
             
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp)
-                ) {
-                    Text(
-                        text = "Desenvolupadors",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        DeveloperCard("Pol Hernández")
-                        DeveloperCard("Teo Aranda")
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Secció de Sistema de Puntuació
+            ScoringSystemSection()
         }
-    }
-}
-
-@Composable
-private fun DeveloperCard(name: String) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(16.dp)
-        )
     }
 } 

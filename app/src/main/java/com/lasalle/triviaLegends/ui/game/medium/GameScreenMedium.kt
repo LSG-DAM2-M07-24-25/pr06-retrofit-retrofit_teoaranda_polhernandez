@@ -14,6 +14,12 @@ import com.lasalle.triviaLegends.ui.game.ErrorScreen
 import com.lasalle.triviaLegends.ui.game.QuestionScreen
 import com.lasalle.triviaLegends.ui.game.GameFinishedScreen
 
+/**
+ * Pantalla de joc per a dispositius mitjans (tablets petites, mòbils en horitzontal)
+ * Mostra un disseny amb un panell lateral esquerre més petit i el contingut principal a la dreta
+ * 
+ * @author Pol & Teo
+ */
 @Composable
 fun GameScreenMedium(
     viewModel: GameViewModel = hiltViewModel()
@@ -35,7 +41,7 @@ fun GameScreenMedium(
             .padding(24.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Panel lateral con información del juego (30% del ancho)
+        // Panell lateral amb informació del joc (30% de l'amplada)
         Card(
             modifier = Modifier
                 .weight(0.3f)
@@ -49,7 +55,7 @@ fun GameScreenMedium(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Puntuación: $score",
+                    text = "Puntuació: $score",
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
@@ -59,7 +65,7 @@ fun GameScreenMedium(
             }
         }
         
-        // Contenido principal (70% del ancho)
+        // Contingut principal (70% de l'amplada)
         Box(
             modifier = Modifier
                 .weight(0.7f)

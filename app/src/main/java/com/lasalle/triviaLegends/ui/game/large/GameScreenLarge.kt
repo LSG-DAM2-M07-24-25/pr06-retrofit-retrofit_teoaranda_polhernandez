@@ -14,6 +14,12 @@ import com.lasalle.triviaLegends.ui.game.ErrorScreen
 import com.lasalle.triviaLegends.ui.game.QuestionScreen
 import com.lasalle.triviaLegends.ui.game.GameFinishedScreen
 
+/**
+ * Pantalla de joc per a dispositius grans (tablets, ordinadors)
+ * Mostra un disseny amb un panell lateral esquerre i el contingut principal a la dreta
+ * 
+ * @author Pol & Teo
+ */
 @Composable
 fun GameScreenLarge(
     viewModel: GameViewModel = hiltViewModel()
@@ -35,7 +41,7 @@ fun GameScreenLarge(
             .padding(32.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Panel lateral izquierdo (20%)
+        // Panell lateral esquerre (20%)
         Card(
             modifier = Modifier
                 .weight(0.2f)
@@ -80,7 +86,7 @@ fun GameScreenLarge(
             }
         }
         
-        // Contenido principal (80%)
+        // Contingut principal (80%)
         Box(
             modifier = Modifier
                 .weight(0.8f)

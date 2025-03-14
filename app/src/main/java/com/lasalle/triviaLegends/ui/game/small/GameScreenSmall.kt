@@ -14,6 +14,12 @@ import com.lasalle.triviaLegends.ui.game.ErrorScreen
 import com.lasalle.triviaLegends.ui.game.QuestionScreen
 import com.lasalle.triviaLegends.ui.game.GameFinishedScreen
 
+/**
+ * Pantalla de joc per a dispositius petits (mòbils)
+ * Mostra un disseny vertical amb tota la informació en una columna
+ * 
+ * @author Pol & Teo
+ */
 @Composable
 fun GameScreenSmall(
     viewModel: GameViewModel = hiltViewModel()

@@ -8,7 +8,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lasalle.triviaLegends.ui.settings.InfoViewModel
+import com.lasalle.triviaLegends.ui.settings.ApiInfoSection
+import com.lasalle.triviaLegends.ui.settings.ScoringSystemSection
+import com.lasalle.triviaLegends.ui.settings.CreditsSection
+import com.lasalle.triviaLegends.ui.settings.DeveloperCard
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.font.FontWeight
 
+/**
+ * Pantalla d'informació per a dispositius grans (tablets, ordinadors)
+ * Mostra un disseny amb dos panells laterals i el contingut principal al centre
+ * 
+ * @author Pol & Teo
+ */
 @Composable
 fun InfoScreenLarge(
     viewModel: InfoViewModel = hiltViewModel()
@@ -18,7 +31,7 @@ fun InfoScreenLarge(
             .fillMaxSize()
             .padding(32.dp)
     ) {
-        // Panel lateral izquierdo (20%)
+        // Panell lateral esquerre (20%)
         Card(
             modifier = Modifier
                 .weight(0.2f)
@@ -37,54 +50,63 @@ fun InfoScreenLarge(
                 Text(
                     text = "Trivia Legends",
                     style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Text(
+                    text = "Versió 1.0",
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
                 Text(
-                    text = "Versió 1.0.0",
+                    text = "API",
                     style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Text(
+                    text = "OpenTDB",
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
         
-        // Contenido principal (60%)
+        // Contingut principal (60%)
         Column(
             modifier = Modifier
                 .weight(0.6f)
                 .fillMaxHeight()
                 .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Text(
                 text = "Informació",
                 style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
             
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp)
-                ) {
-                    Text(
-                        text = "Sobre l'aplicació",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Trivia Legends és un joc de preguntes i respostes desenvolupat per estudiants de La Salle. Aquest projecte forma part de l'assignatura de Desenvolupament d'Aplicacions Mòbils i té com a objectiu demostrar els coneixements adquirits en el desenvolupament d'aplicacions Android utilizando Kotlin i Jetpack Compose.",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
+            // Secció sobre l'API
+            ApiInfoSection()
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Secció de Sistema de Puntuació
+            ScoringSystemSection()
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Secció d'Agraïments
+            CreditsSection()
         }
         
-        // Panel lateral derecho (20%)
+        // Panell lateral dret (20%)
         Card(
             modifier = Modifier
                 .weight(0.2f)
@@ -103,7 +125,8 @@ fun InfoScreenLarge(
                 Text(
                     text = "Desenvolupadors",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    fontWeight = FontWeight.Bold
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))

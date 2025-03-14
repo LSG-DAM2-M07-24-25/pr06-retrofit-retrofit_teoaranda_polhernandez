@@ -8,7 +8,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lasalle.triviaLegends.ui.settings.InfoViewModel
+import com.lasalle.triviaLegends.ui.settings.ApiInfoSection
+import com.lasalle.triviaLegends.ui.settings.ScoringSystemSection
+import com.lasalle.triviaLegends.ui.settings.CreditsSection
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.font.FontWeight
 
+/**
+ * Pantalla d'informació per a dispositius petits (mòbils)
+ * Mostra un disseny vertical amb tota la informació en una columna
+ * 
+ * @author Pol & Teo
+ */
 @Composable
 fun InfoScreenSmall(
     viewModel: InfoViewModel = hiltViewModel()
@@ -17,85 +29,27 @@ fun InfoScreenSmall(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Informació",
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 16.dp)
         )
         
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Sobre l'aplicació",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Trivia Legends és un joc de preguntes i respostes desenvolupat per estudiants de La Salle.",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
+        // Secció sobre l'API
+        ApiInfoSection()
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Desenvolupadors",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Pol Hernández",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = "Teo Aranda",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
+        // Secció de Sistema de Puntuació
+        ScoringSystemSection()
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Versió",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "1.0.0",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
+        // Secció d'Agraïments
+        CreditsSection()
     }
 } 

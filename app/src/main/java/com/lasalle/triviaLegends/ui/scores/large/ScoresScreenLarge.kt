@@ -9,22 +9,55 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lasalle.triviaLegends.ui.scores.ScoresViewModel
 import com.lasalle.triviaLegends.ui.scores.ScoreUiModel
+import com.lasalle.triviaLegends.ui.scores.ScoreCard
+import com.lasalle.triviaLegends.ui.scores.StatCard
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 
+/**
+ * Pantalla de puntuacions per a dispositius grans (tablets, ordinadors)
+ * Mostra un disseny amb un panell lateral esquerre i una graella de puntuacions
+ * 
+ * @author Pol & Teo
+ */
 @Composable
 fun ScoresScreenLarge(
     viewModel: ScoresViewModel = hiltViewModel()
 ) {
     val scores by viewModel.scores.collectAsState()
+    val bestScore by viewModel.bestScore.collectAsState()
+    val worstScore by viewModel.worstScore.collectAsState()
+    val averageScore by viewModel.averageScore.collectAsState()
+    
+    // Estat per a la cerca
+    var searchQuery by remember { mutableStateOf("") }
+    
+    // Filtrar les puntuacions segons la cerca
+    val filteredScores = remember(scores, searchQuery) {
+        if (searchQuery.isEmpty()) {
+            scores
+        } else {
+            scores.filter { score ->
+                score.difficulty.contains(searchQuery, ignoreCase = true) ||
+                score.formattedDate.contains(searchQuery, ignoreCase = true) ||
+                score.score.toString().contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
     
     Row(
         modifier = Modifier
             .fillMaxSize()
             .padding(32.dp)
     ) {
-        // Panel lateral izquierdo (20%)
+        // Panell lateral esquerre (20%)
         Card(
             modifier = Modifier
                 .weight(0.2f)
@@ -39,7 +72,8 @@ fun ScoresScreenLarge(
             ) {
                 Text(
                     text = "Estadístiques",
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
                 )
                 
                 val totalGames = scores.size
@@ -55,10 +89,25 @@ fun ScoresScreenLarge(
                     title = "Puntuació mitjana",
                     value = avgScore.toString()
                 )
+                
+                // Millor i pitjor puntuació
+                bestScore?.let { score ->
+                    StatCard(
+                        title = "Millor puntuació",
+                        value = score.score.toString()
+                    )
+                }
+                
+                worstScore?.let { score ->
+                    StatCard(
+                        title = "Pitjor puntuació",
+                        value = score.score.toString()
+                    )
+                }
             }
         }
         
-        // Contenido principal (80%)
+        // Contingut principal (80%)
         Column(
             modifier = Modifier
                 .weight(0.8f)
@@ -67,80 +116,74 @@ fun ScoresScreenLarge(
             Text(
                 text = "Historial de Puntuacions",
                 style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(bottom = 24.dp)
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
             
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(scores) { score ->
-                    ScoreCard(score = score)
+            // Barra de cerca
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                placeholder = { Text("Cerca per data, dificultat o puntuació") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Cerca",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Netejar",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+            
+            if (filteredScores.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (searchQuery.isEmpty()) 
+                            "Juga una partida per veure l'historial" 
+                        else 
+                            "No s'han trobat resultats per '$searchQuery'",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(filteredScores) { score ->
+                        ScoreCard(score = score)
+                    }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun StatCard(title: String, value: String) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
-        }
-    }
-}
-
-@Composable
-private fun ScoreCard(score: ScoreUiModel) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ) {
-            Text(
-                text = "Puntuació",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            Text(
-                text = "${score.score}",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "Respostes correctes: ${score.correctAnswers}/${score.totalQuestions}",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = "Data: ${score.formattedDate}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 } 

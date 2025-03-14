@@ -69,16 +69,16 @@ class TriviaRepository @Inject constructor(
     /**
      * Obté la millor puntuació
      * @return Flow amb la millor puntuació o null si no n'hi ha cap
-     */
+
     fun getBestScore(): Flow<UserScore?> {
         return userScoreDao.getBestScore()
     }
-    
-    /**
+
      * Obté la puntuació mitjana
      * @return Flow amb la mitjana de puntuacions
-     */
+
     fun getAverageScore(): Flow<Float> {
         return userScoreDao.getAverageScore()
     }
+    **/
 } 
